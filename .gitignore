@@ -1,0 +1,43 @@
+# ===== Unreal Engine generated / intermediate (regenerated on open) =====
+Binaries/
+Intermediate/
+DerivedDataCache/
+Saved/
+Build/
+
+# ===== Visual Studio =====
+.vs/
+.vsconfig
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.opendb
+
+# ===== IDE / editor user files =====
+.idea/
+.vscode/
+Config/Layouts/
+
+# ===== Claude Code local settings =====
+.claude/
+
+# ===== Crash dumps / debug leftovers =====
+*.dmp
+
+# ===== OS junk =====
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# ===== Unused MetaHuman leftover (Main.umap references MH_Woman, not Cooper) =====
+Content/MetaHumans/Cooper/
+
+# ===== Debug leftovers =====
+Scripts/_keepalive_quit.py
+Scripts/_minimal_quit.py
+
+# ===== Demo GIF (265MB) — compress first, then delete this line to commit it =====
+演示gif.gif
