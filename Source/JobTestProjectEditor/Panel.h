@@ -83,9 +83,9 @@ public:
 	void Render();
 
 	// 导出json文件存放路径、渲染结果输出路径
-	static constexpr const TCHAR* SnapshotFilePath = TEXT("Saved/StateSnapshots/exported_state.json");
-	static constexpr const TCHAR* RenderOutputDirectory = TEXT("Saved/MovieRenders");
-	static constexpr const TCHAR* RenderStateFilePath = TEXT("Saved/StateSnapshots/render_state.json");
+	static constexpr const TCHAR* SnapshotFilePath = TEXT("Saved/ToolOutput/exported_state.json");
+	static constexpr const TCHAR* RenderOutputDirectory = TEXT("Saved/ToolOutput");
+	static constexpr const TCHAR* RenderStateFilePath = TEXT("Saved/ToolOutput/render_state.json");
 
 protected:
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -98,6 +98,9 @@ private:
 
 	// 按当前 BodyAnimation / BodyProgress / FacialExpressions 全量重同步身体姿态与面部表情。
 	void RefreshBodyAndFacial();
+
+	// 渲染完成回调（由 UMetaHumanRenderController::OnRenderFinished 广播触发），弹出右下角通知。
+	void OnRenderFinishedHandler(bool bSuccess);
 
 	// 在按钮行里创建一个与编辑器属性面板样式一致的按钮（返回按钮以便绑定 OnClicked）。
 	UButton* CreateActionButton(UHorizontalBox* Row, const FString& Name, const FString& Label);

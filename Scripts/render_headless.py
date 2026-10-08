@@ -29,8 +29,8 @@ def _resolve(path, default):
 
 
 def main():
-    state_path = _resolve(os.environ.get("META_STATE"), "Saved/StateSnapshots/exported_state.json")
-    out_dir = _resolve(os.environ.get("META_OUT"), "Saved/MovieRenders")
+    state_path = _resolve(os.environ.get("META_STATE"), "Saved/ToolOutput/exported_state.json")
+    out_dir = _resolve(os.environ.get("META_OUT"), "Saved/ToolOutput")
     warmup = int(os.environ.get("META_WARMUP", "32"))
 
     world = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_editor_world()

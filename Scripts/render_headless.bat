@@ -9,8 +9,8 @@ REM  Usage:
 REM    render_headless.bat [--build] [state.json]
 REM
 REM  Defaults (override by editing the variables below or passing a state path):
-REM    state  : <project>\Saved\StateSnapshots\exported_state.json
-REM    output : <project>\Saved\MovieRenders
+REM    state  : <project>\Saved\ToolOutput\exported_state.json
+REM    output : <project>\Saved\ToolOutput
 REM    warm-up: 32 frames (Groom/Cloth settle)
 REM ===========================================================================
 
@@ -24,8 +24,8 @@ if not exist "%ENGINE_DIR%\Engine\Binaries\Win64\UnrealEditor-Cmd.exe" (
     exit /b 1
 )
 
-set "META_STATE=%PROJECT_DIR%\Saved\StateSnapshots\exported_state.json"
-set "META_OUT=%PROJECT_DIR%\Saved\MovieRenders"
+set "META_STATE=%PROJECT_DIR%\Saved\ToolOutput\exported_state.json"
+set "META_OUT=%PROJECT_DIR%\Saved\ToolOutput"
 set "META_WARMUP=32"
 set "DO_BUILD=0"
 

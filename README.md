@@ -85,7 +85,7 @@ Python 脚本：
 Scripts\render_headless.bat [--build] [state.json]
 ```
 
-- 默认 state 为 `Saved/StateSnapshots/exported_state.json`，输出到 `Saved/MovieRenders`，预热 32 帧。
+- 默认 state 为 `Saved/ToolOutput/exported_state.json`，输出到 `Saved/ToolOutput`，预热 32 帧。
 - `--build` 先编译再渲染。
 - 启动前若检测到交互式编辑器正在运行则拒绝执行（避免无头与交互式编辑器共享模块状态，导致无头编辑器关机阶段 0xC0000005 崩溃）。
 

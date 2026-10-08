@@ -22,6 +22,25 @@
 #include "Misc/Paths.h"
 #include "Tools/ControlRigPose.h"
 #include "UObject/UnrealType.h"
+#include "Framework/Notifications/NotificationManager.h"
+#include "Widgets/Notifications/SNotificationList.h"
+
+
+namespace
+{
+	// 右下角通知：成功显示绿勾、失败显示红叉，几秒后自动消失。
+	void ShowEditorToast(const FString& Message, bool bSuccess = true, float ExpireSeconds = 3.f)
+	{
+		FNotificationInfo Info(FText::FromString(Message));
+		Info.ExpireDuration = ExpireSeconds;
+		Info.bUseSuccessFailIcons = true;
+		TSharedPtr<SNotificationItem> Item = FSlateNotificationManager::Get().AddNotification(Info);
+		if (Item.IsValid())
+		{
+			Item->SetCompletionState(bSuccess ? SNotificationItem::CS_Success : SNotificationItem::CS_Fail);
+		}
+	}
+}
 
 
 #pragma region SetupPanel
@@ -53,6 +72,9 @@ TSharedRef<SWidget> UMetaHumanPanel::RebuildWidget()
 		DetailsView->bShowScrollBar = false;
 		DetailsView->SetObject(this);
 		Root->AddChildToVerticalBox(DetailsView);
+
+		// 渲染完成时弹右下角通知（广播由 RenderController 在 executor 结束时触发）。
+		UMetaHumanRenderController::OnRenderFinished.AddUObject(this, &UMetaHumanPanel::OnRenderFinishedHandler);
 	}
 	return Super::RebuildWidget();
 }
@@ -158,7 +180,11 @@ void UMetaHumanPanel::ImportJson()
 {
 	const FString Path = FPaths::ProjectDir() / SnapshotFilePath;
 	FCharacterState State;
-	if (!UMetaHumanStateSerial::ImportStateFromJson(Path, State)) { return; }
+	if (!UMetaHumanStateSerial::ImportStateFromJson(Path, State))
+	{
+		ShowEditorToast(FString::Printf(TEXT("导入Json失败：%s"), *Path), /*bSuccess=*/false);
+		return;
+	}
 	// 身体
 	BodyAnimation = State.Body.AnimationAsset.IsEmpty() ? nullptr : LoadObject<UAnimSequence>(nullptr, *State.Body.AnimationAsset);
 	BodyProgress = 0.f;
@@ -183,6 +209,7 @@ void UMetaHumanPanel::ImportJson()
 	// 刷新
 	RefreshBodyAndFacial();
 	if (DetailsView) { DetailsView->SetObject(this); }
+	ShowEditorToast(FString::Printf(TEXT("导入Json成功：%s"), *Path));
 }
 
 
@@ -213,7 +240,10 @@ void UMetaHumanPanel::ExportJson()
 	State.RenderSettings.OutputFilename = OutPutName;
 	// 存盘为Json
 	const FString Path = FPaths::ProjectDir() / SnapshotFilePath;
-	UMetaHumanStateSerial::ExportStateToJson(State, Path);
+	const bool bOk = UMetaHumanStateSerial::ExportStateToJson(State, Path);
+	ShowEditorToast(
+		FString::Printf(TEXT("%s：%s"), bOk ? TEXT("导出Json成功") : TEXT("导出Json失败"), *Path),
+		bOk);
 }
 
 
@@ -230,8 +260,20 @@ void UMetaHumanPanel::Render()
 	State.RenderSettings.OutputFilename = FString::Printf(TEXT("State_%s"), *CameraName);
 	// 存盘为json再调用渲染
 	const FString StateJsonPath = FPaths::ProjectDir() / RenderStateFilePath;
-	if (!UMetaHumanStateSerial::ExportStateToJson(State, StateJsonPath)) { return; }
+	if (!UMetaHumanStateSerial::ExportStateToJson(State, StateJsonPath))
+	{
+		ShowEditorToast(FString::Printf(TEXT("渲染状态写入失败：%s"), *StateJsonPath), /*bSuccess=*/false);
+		return;
+	}
 	const FString OutputDirectory = FPaths::ProjectDir() / RenderOutputDirectory;
 	const bool bStarted = UMetaHumanRenderController::RenderStateFromJson( World, StateJsonPath, OutputDirectory, WarmUpFrames);
+	ShowEditorToast(bStarted ? TEXT("渲染开始") : TEXT("渲染启动失败"), bStarted);
+}
+
+
+void UMetaHumanPanel::OnRenderFinishedHandler(bool bSuccess)
+{
+	// 渲染完成/失败通知由 RenderController 的 OnRenderFinished 广播触发（executor 结束回调）。
+	ShowEditorToast(bSuccess ? TEXT("渲染完成") : TEXT("渲染失败"), bSuccess);
 }
 #pragma endregion

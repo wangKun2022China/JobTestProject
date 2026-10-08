@@ -8,12 +8,20 @@ class UMoviePipelineExecutorJob;
 class UObject;
 
 
+// 渲染完成广播（参数：bSuccess）。编辑器面板监听它弹出右下角通知；
+// 无头路径的 QuitEditorOnRenderFinished 会另行钩住 executor 并退出，两者互不影响。
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMetaHumanRenderFinished, bool /*bSuccess*/);
+
+
 UCLASS()
 class JOBTESTPROJECTEDITOR_API UMetaHumanRenderController : public UObject
 {
 	GENERATED_BODY()
 
 public:
+	// 渲染完成时广播（bSuccess）。编辑器面板监听此事件弹出右下角通知。
+	static FOnMetaHumanRenderFinished OnRenderFinished;
+
 	// 进行配置
 	UFUNCTION(BlueprintCallable, Category = "MetaHuman|Render")
 	static void ConfigureRenderJob(

@@ -26,6 +26,10 @@
 #include "UObject/SoftObjectPath.h"
 
 
+// 渲染完成广播的静态成员定义（编辑器面板监听它弹出右下角通知）。
+FOnMetaHumanRenderFinished UMetaHumanRenderController::OnRenderFinished;
+
+
 namespace
 {
 	// 待 PIE executor 启动后、需在该 PIE 世界内重新应用的 JSON 状态路径。
@@ -173,6 +177,13 @@ bool UMetaHumanRenderController::RenderSequence(
 	UMoviePipelinePIEExecutor* PIEExecutor = NewObject<UMoviePipelinePIEExecutor>(QueueSubsystem);
 	PIEExecutor->SetAllowUsingUnsavedLevels(true);
 	QueueSubsystem->RenderQueueWithExecutorInstance(PIEExecutor);
+
+	// 渲染完成时广播，供编辑器 UI 弹右下角通知。无头路径的 QuitEditorOnRenderFinished
+	// 会另钩住同一 executor 的 OnExecutorFinished 并退出，两者互不影响。
+	PIEExecutor->OnExecutorFinished().AddLambda([](UMoviePipelineExecutorBase*, bool bSuccess)
+	{
+		UMetaHumanRenderController::OnRenderFinished.Broadcast(bSuccess);
+	});
 
 	return true;
 }
