@@ -11,7 +11,7 @@ UE 5.6 C++ 测试工程：把 MetaHuman 的**身体姿态**与**面部表情**�
 
 **身体**：把 Body 网格切到 `AnimationSingleNode` 单节点动画实例，`PlayAnimation` 后 `SetPosition(TimePosition)` 定位到目标帧、`SetPlayRate(0)` 冻结，再 `RefreshBoneTransforms()` 强刷使该帧立即生效。
 
-**表情**：仿 Level Sequence 的 Control Rig 轨道方案——新建/复用 `UControlRigComponent` 承载 MetaHuman 面部 rig（`bUpdateRigOnTick=false` 阻止自动 tick 复位表情），对每个 `UControlRigPoseAsset` 按其强度计算相对中性的增量并累加，把「中性 + Σ增量」写回 `CTRL_*` 控制，执行一次 `Execute(Forwards)` 求解：`CTRL_expressions_*` 曲线注入主 AnimInstance 的 StoredCurves，再由后处理 AnimBP（ABP_Face_PostProcess）的 RigLogic 驱动 morph target 与下颌。
+**表情**：仿 Level Sequence 的 Control Rig 轨道方案——新建/复用 `UControlRigComponent` 承载 MetaHuman 面部 rig（`bUpdateRigOnTick=false` 阻止自动 tick 复位表情），对每个 `UControlRigPoseAsset` 按其强度计算相对默认的增量并累加，把「默认 + Σ增量」写回 `CTRL_*` 控制，执行一次 `Execute(Forwards)` 求解：`CTRL_expressions_*` 曲线注入主 AnimInstance 的 StoredCurves，再由后处理 AnimBP（ABP_Face_PostProcess）的 RigLogic 驱动 morph target 与骨骼。
 
 输入只有两个数值结构——`FBodyState{ AnimationAsset, TimePosition }` 与 `FFacialCurves{ 姿势资产路径 → 强度 }`。全程无 Montage、无时间轴播放，画面由纯数值驱动并保持静态。
 
