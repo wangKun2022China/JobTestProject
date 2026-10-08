@@ -38,6 +38,3 @@ Content/MetaHumans/Cooper/
 # ===== Debug leftovers =====
 Scripts/_keepalive_quit.py
 Scripts/_minimal_quit.py
-
-# ===== Demo GIF (265MB) — compress first, then delete this line to commit it =====
-演示gif.gif
